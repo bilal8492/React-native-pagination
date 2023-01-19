@@ -1,0 +1,178 @@
+import React, { useState } from 'react';
+
+import { View, Text, Button, Modal } from 'react-native';
+
+import { Calendar } from 'react-native-calendars';
+
+const CustomCalendar = () => {
+
+  const [selectedDate, setSelectedDate] = useState('');
+
+  const [displayMonth, setDisplayMonth] = useState(new Date());
+
+  const [showModal, setShowModal] = useState(false);
+
+  const prevMonth = () => {
+
+    let month = displayMonth.getMonth();
+
+    let year = displayMonth.getFullYear();
+
+    if (month === 0) {
+
+      month = 11;
+
+      year--;
+
+    } else {
+
+      month--;
+
+    }
+
+    setDisplayMonth(new Date(year, month));
+
+  }
+
+  const nextMonth = () => {
+
+    let month = displayMonth.getMonth();
+
+    let year = displayMonth.getFullYear();
+
+    if (month === 11) {
+
+      month = 0;
+
+      year++;
+
+    } else {
+
+      month++;
+
+    }
+
+    setDisplayMonth(new Date(year, month));
+
+  }
+
+  const onDayPress = (day) => {
+
+    setSelectedDate(day);
+
+    setShowModal(true);
+
+  }
+
+  return (
+
+    <View>
+
+      <View style={{flexDirection: 'row', justifyContent: 'space-between', padding: 10}}>
+
+        <Button title={'<'} onPress={prevMonth} />
+
+        <Text>{displayMonth.toLocaleString('default', { month: 'long' })}</Text>
+
+        <Button title={'>'} onPress={nextMonth} />
+
+      </View>
+
+      <Calendar
+
+        current={displayMonth}
+
+        theme={{
+
+          backgroundColor: 'black',
+
+          calendarBackground: 'black',
+
+          textSectionTitleColor: 'white',
+
+          selectedDayBackgroundColor: 'white',
+
+          selectedDayTextColor: 'black',
+
+          todayTextColor: 'white',
+
+          dayTextColor: 'white',
+
+          textDisabledColor: 'gray',
+
+          dotColor: 'white',
+
+          selectedDotColor: 'black',
+
+          arrowColor: 'white',
+
+          monthTextColor: 'white',
+
+          indicatorColor: 'white',
+
+          textDayFontFamily: 'System',
+
+          textMonthFontFamily: 'System',
+
+          textDayHeaderFontFamily: 'System',
+
+          textMonthFontWeight: 'bold',
+
+          textDayFontSize: 15,
+
+          textMonthFontSize: 18,
+
+          textDayHeaderFontSize: 15
+
+        }}
+
+        onDayPress={onDayPress}
+
+        markedDates={{[selectedDate.dateString]: {selected: true}}}
+
+        accessibilityLabel={'Calendar'}
+
+        importantForAccessibility={'yes'}
+
+        accessibilityLiveRegion={'polite'}
+
+        accessibilityRole={'button'}
+
+        markingType={'custom'}
+
+        firstDay={1}
+
+        monthFormat={'MMMM yyyy'}
+
+      />
+
+      <Modal
+
+        visible={showModal}
+
+        animationType={'slide'}
+
+       onRequestClose={() => {setShowModal(false)}}
+
+>
+
+<View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+
+<Text>Selected Date: {selectedDate.dateString}</Text>
+
+<Text>Event: {selectedDate.event}</Text>
+
+<Button title={'Close'} onPress={() => {setShowModal(false)}} />
+
+</View>
+
+</Modal>
+
+</View>
+
+);
+
+};
+
+export default CustomCalendar;
+
