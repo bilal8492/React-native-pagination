@@ -10,9 +10,12 @@ const panResponder = PanResponder.create({
   },
 
   onPanResponderMove: (evt, gestureState) => {
-    setScale(new Animated.Value(gestureState.scale));
+    if (gestureState.scale) {
+      setScale(new Animated.Value(gestureState.scale));
+    }
   },
 });
+
 
 
 
