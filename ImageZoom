@@ -1,39 +1,41 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import { View, Image, PanResponder, Animated } from "react-native";
 
-import { View, Image, Animated, PanResponder } from 'react-native';
+const PinchZoomView = () => {
+  const [scale, setScale] = useState(new Animated.Value(1));
+  const [pan, setPan] = useState(new Animated.ValueXY());
 
-const [scale, setScale] = useState(new Animated.Value(1));
+  const panResponder = PanResponder.create({
+    onMoveShouldSetPanResponder: (evt, gestureState) => {
+      return gestureState.numberActiveTouches === 2;
+    },
 
-const panResponder = PanResponder.create({
-  onMoveShouldSetPanResponder: (evt, gestureState) => {
-    return gestureState.numberActiveTouches === 2;
-  },
+    onPanResponderMove: (evt, gestureState) => {
+      if (gestureState.scale) {
+        setScale(new Animated.Value(gestureState.scale));
+      }
+    },
+  });
 
-  onPanResponderMove: (evt, gestureState) => {
-    if (gestureState.scale) {
-      setScale(new Animated.Value(gestureState.scale));
-    }
-  },
-});
+  const zoom = scale.interpolate({
+    inputRange: [1, 2],
+    outputRange: [1, 2],
+    extrapolate: "clamp",
+  });
 
+  const panWithZoom = {
+    transform: [{ scale: zoom }, ...pan.getTranslateTransform()],
+  };
 
+  return (
+    <View style={{ flex: 1 }}>
+      <Animated.Image
+        source={{ uri: "https://picsum.photos/id/237/200/300" }}
+        style={[panWithZoom, { width: 200, height: 300 }]}
+        {...panResponder.panHandlers}
+      />
+    </View>
+  );
+};
 
-
-
-<View style={{ flex: 1 }} {...panResponder.panHandlers}>
-
-  <Animated.Image
-
-    style={{
-
-      transform: [{ scale: scale }],
-
-    }}
-
-    source={{ uri: 'YOUR_IMAGE_URL' }}
-
-    resizeMode="contain"
-
-  />
-
-</View>
+export default PinchZoomView;
