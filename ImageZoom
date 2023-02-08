@@ -1,37 +1,62 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { View, Image, PanResponder, Animated } from "react-native";
 
 const PinchZoomView = () => {
+  const [baseScale, setBaseScale] = useState(new Animated.Value(1));
   const [scale, setScale] = useState(new Animated.Value(1));
   const [pan, setPan] = useState(new Animated.ValueXY());
+
+  const imageRef = useRef(null);
+
+  const handlePinch = Animated.event([
+    {
+      nativeEvent: { scale: scale },
+    },
+  ], { useNativeDriver: true });
+
+  const handlePan = Animated.event([
+    {
+      nativeEvent: {
+        translationX: pan.x,
+        translationY: pan.y,
+      },
+    },
+  ], { useNativeDriver: true });
 
   const panResponder = PanResponder.create({
     onMoveShouldSetPanResponder: (evt, gestureState) => {
       return gestureState.numberActiveTouches === 2;
     },
 
+    onPanResponderGrant: () => {
+      setBaseScale(scale);
+    },
+
     onPanResponderMove: (evt, gestureState) => {
-      if (gestureState.scale) {
-        setScale(new Animated.Value(gestureState.scale));
-      }
+      handlePinch(evt, gestureState);
+      handlePan(evt, gestureState);
     },
   });
-
-  const zoom = scale.interpolate({
-    inputRange: [1, 2],
-    outputRange: [1, 2],
-    extrapolate: "clamp",
-  });
-
-  const panWithZoom = {
-    transform: [{ scale: zoom }, ...pan.getTranslateTransform()],
-  };
 
   return (
     <View style={{ flex: 1 }}>
       <Animated.Image
+        ref={imageRef}
         source={{ uri: "https://picsum.photos/id/237/200/300" }}
-        style={[panWithZoom, { width: 200, height: 300 }]}
+        style={[
+          {
+            transform: [
+              { scale: baseScale.interpolate({
+                inputRange: [1, 2],
+                outputRange: [1, 2],
+                extrapolate: "clamp",
+              })
+              },
+              ...pan.getTranslateTransform(),
+            ],
+          },
+          { width: 200, height: 300 },
+        ]}
         {...panResponder.panHandlers}
       />
     </View>
