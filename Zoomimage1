@@ -1,0 +1,57 @@
+import React, { useState, useRef } from 'react';
+import { View, Image, PanResponder, Animated } from 'react-native';
+
+const PinchZoomView = () => {
+  const [scale, setScale] = useState(new Animated.Value(1));
+  const [pan, setPan] = useState(new Animated.ValueXY());
+
+  const panResponder = PanResponder.create({
+    onMoveShouldSetPanResponder: (evt, gestureState) => {
+      return gestureState.numberActiveTouches === 2;
+    },
+    onPanResponderGrant: () => {
+      setScale(new Animated.Value(1));
+      setPan(new Animated.ValueXY());
+    },
+    onPanResponderMove: Animated.event([
+      null,
+      {
+        dx: pan.x,
+        dy: pan.y,
+      },
+    ]),
+    onPanResponderRelease: () => {
+      setPan(new Animated.ValueXY());
+    },
+    onPanResponderTerminate: () => {
+      setPan(new Animated.ValueXY());
+    },
+  });
+
+  const handlePinch = Animated.event(
+    [{ scale: scale }],
+    { useNativeDriver: true },
+  );
+
+  return (
+    <View style={{ flex: 1 }}>
+      <Animated.View
+        style={{
+          transform: [
+            { scale },
+            { translateX: pan.x },
+            { translateY: pan.y },
+          ],
+        }}
+        {...panResponder.panHandlers}
+      >
+        <Image
+          source={{ uri: 'https://picsum.photos/200/300' }}
+          style={{ width: 200, height: 300 }}
+        />
+      </Animated.View>
+    </View>
+  );
+};
+
+export default PinchZoomView;
