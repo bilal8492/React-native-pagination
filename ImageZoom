@@ -1,0 +1,45 @@
+import React, { useState } from 'react';
+
+import { View, Image, Animated, PanResponder } from 'react-native';
+
+const [scale, setScale] = useState(new Animated.Value(1));
+
+const panResponder = PanResponder.create({
+
+  onMoveShouldSetPanResponder: (evt, gestureState) => {
+
+    return gestureState.numberActiveTouches === 2;
+
+  },
+
+  onPanResponderMove: Animated.event([
+
+    null,
+
+    {
+
+      scale: scale,
+
+    },
+
+  ]),
+
+});
+
+<View style={{ flex: 1 }} {...panResponder.panHandlers}>
+
+  <Animated.Image
+
+    style={{
+
+      transform: [{ scale: scale }],
+
+    }}
+
+    source={{ uri: 'YOUR_IMAGE_URL' }}
+
+    resizeMode="contain"
+
+  />
+
+</View>
